@@ -119,10 +119,9 @@ class MainTableViewController: UITableViewController {
     
     func calculateAge(from birthDate: String) -> String {
         let dateFormatter = DateFormatter()
-        let currentDate = Date()
         dateFormatter.dateFormat = "yyyy/MM/dd"
         guard let date = dateFormatter.date(from: birthDate) else { return "" }
-        let components = Calendar.current.dateComponents([.year], from: date, to: currentDate)
+        let components = Calendar.current.dateComponents([.year], from: date, to: Date())
         return "\(components.year ?? 0) years old"
     }
     
