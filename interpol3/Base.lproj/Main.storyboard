@@ -17,28 +17,28 @@
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <prototypes>
                             <tableViewCell clipsSubviews="YES" contentMode="right" preservesSuperviewLayoutMargins="YES" selectionStyle="default" accessoryType="disclosureIndicator" indentationWidth="10" reuseIdentifier="mainCell" textLabel="G0z-hu-dzV" detailTextLabel="VKA-l1-17v" imageView="ltb-jp-N6j" style="IBUITableViewCellStyleSubtitle" id="rNI-Mb-yfk">
-                                <rect key="frame" x="0.0" y="50" width="393" height="43.666667938232422"/>
+                                <rect key="frame" x="0.0" y="50" width="393" height="63.666667938232422"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="right" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="rNI-Mb-yfk" id="Qlm-Pq-wzM">
-                                    <rect key="frame" x="0.0" y="0.0" width="362.66666666666669" height="43.666667938232422"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="362.66666666666669" height="63.666667938232422"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <label opaque="NO" multipleTouchEnabled="YES" contentMode="right" insetsLayoutMarginsFromSafeArea="NO" text="Title" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="G0z-hu-dzV">
-                                            <rect key="frame" x="58.999999999999986" y="1" width="38.333333333333336" height="21.666666666666668"/>
+                                            <rect key="frame" x="58.999999999999986" y="7.6666666666666661" width="38.333333333333336" height="21.666666666666668"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <fontDescription key="fontDescription" type="boldSystem" pointSize="18"/>
                                             <nil key="textColor"/>
                                             <nil key="highlightedColor"/>
                                         </label>
                                         <label opaque="NO" multipleTouchEnabled="YES" contentMode="right" insetsLayoutMarginsFromSafeArea="NO" text="Subtitle" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="VKA-l1-17v">
-                                            <rect key="frame" x="58.999999999999986" y="22.666666666666671" width="58.333333333333336" height="20.333333333333332"/>
+                                            <rect key="frame" x="58.999999999999986" y="32.666666666666671" width="58.333333333333336" height="20.333333333333332"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                             <nil key="textColor"/>
                                             <nil key="highlightedColor"/>
                                         </label>
                                         <imageView opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleAspectFill" insetsLayoutMarginsFromSafeArea="NO" image="person" catalog="system" id="ltb-jp-N6j">
-                                            <rect key="frame" x="22.666666666666664" y="12.666666666666666" width="18.666666666666668" height="17.666666666666668"/>
+                                            <rect key="frame" x="22.666666666666664" y="22.666666666666664" width="18.666666666666668" height="17.666666666666668"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                         </imageView>
                                     </subviews>
@@ -53,11 +53,41 @@
                     <navigationItem key="navigationItem" id="NfO-7K-HMR"/>
                     <connections>
                         <segue destination="8LQ-NI-e9w" kind="show" identifier="detailVC" id="Fst-0J-0SJ"/>
+                        <segue destination="GWc-Tr-nqj" kind="show" identifier="searchVC" id="EoE-WK-1jc"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="H42-sK-gtf" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="932" y="-35"/>
+        </scene>
+        <!--SEARCH-->
+        <scene sceneID="mNo-Md-P98">
+            <objects>
+                <tableViewController storyboardIdentifier="searchVC" id="GWc-Tr-nqj" customClass="SearchTableViewController" customModule="interpol3" customModuleProvider="target" sceneMemberID="viewController">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" id="liH-mg-Ic5">
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <prototypes>
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="searchCell" id="d9e-9y-UUA">
+                                <rect key="frame" x="0.0" y="50" width="393" height="43.666667938232422"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="d9e-9y-UUA" id="5gp-lS-sl4">
+                                    <rect key="frame" x="0.0" y="0.0" width="393" height="43.666667938232422"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                </tableViewCellContentView>
+                            </tableViewCell>
+                        </prototypes>
+                        <connections>
+                            <outlet property="dataSource" destination="GWc-Tr-nqj" id="nqg-84-JWJ"/>
+                            <outlet property="delegate" destination="GWc-Tr-nqj" id="gBO-KW-nxq"/>
+                        </connections>
+                    </tableView>
+                    <navigationItem key="navigationItem" title="SEARCH" id="cgM-KO-T6f"/>
+                </tableViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="RVo-Ei-9U8" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1789" y="-335"/>
         </scene>
         <!--Detail Table View Controller-->
         <scene sceneID="Hb9-QB-TMI">
@@ -102,7 +132,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="XPJ-Zr-tp4" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1660" y="-35"/>
+            <point key="canvasLocation" x="1789" y="340"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="JQc-Jg-FLf">

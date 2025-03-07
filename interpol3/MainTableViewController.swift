@@ -24,7 +24,7 @@ class MainTableViewController: UITableViewController {
         
         //        self.navigationItem.rightBarButtonItem = self.editButtonItem
         //       self.navigationItem.rightBarButtonItem = self.editButtonItem
-        navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .search, target: self, action: #selector(openSearchVC))
+        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .search, target: self, action: #selector(openSearchVC))
         
              tableView.rowHeight = 160
              let headerLabel = UILabel()
@@ -114,7 +114,8 @@ class MainTableViewController: UITableViewController {
         
     
     @objc func openSearchVC() {
-        
+        let searchVC = storyboard?.instantiateViewController(withIdentifier: "searchVC") as! SearchTableViewController
+        navigationController?.pushViewController(searchVC, animated: true)
     }
     
     func calculateAge(from birthDate: String) -> String {
