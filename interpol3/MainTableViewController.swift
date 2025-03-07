@@ -14,10 +14,7 @@ class MainTableViewController: UITableViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        //commit 3
-
-        // 2 commit 2
+//        title = "INTERPOL"
         
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
@@ -102,7 +99,8 @@ class MainTableViewController: UITableViewController {
             cell.detailTextLabel!.bottomAnchor.constraint(greaterThanOrEqualTo: cell.bottomAnchor, constant: -30)
         ])
         cell.textLabel?.text = "\(notes[indexPath.row].name)\n\(notes[indexPath.row].forename)"
-        cell.detailTextLabel?.text = "\(notes[indexPath.row].dateOfBirth)"
+        cell.detailTextLabel!.text = calculateAge(from: notes[indexPath.row].dateOfBirth)
+
         return cell
     }
     
@@ -117,6 +115,15 @@ class MainTableViewController: UITableViewController {
     
     @objc func openSearchVC() {
         
+    }
+    
+    func calculateAge(from birthDate: String) -> String {
+        let dateFormatter = DateFormatter()
+        let currentDate = Date()
+        dateFormatter.dateFormat = "yyyy/MM/dd"
+        guard let date = dateFormatter.date(from: birthDate) else { return "" }
+        let components = Calendar.current.dateComponents([.year], from: date, to: currentDate)
+        return "\(components.year ?? 0) years old"
     }
     
     
