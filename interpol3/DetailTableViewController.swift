@@ -17,6 +17,7 @@ class DetailTableViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+//        createHeaderView()
         getPersonInfo()
         
         tableView.delegate = self
@@ -24,7 +25,6 @@ class DetailTableViewController: UITableViewController {
         tableView.estimatedRowHeight = 20
         tableView.rowHeight = UITableView.automaticDimension
     
-        createHeaderView()
     }
     
     
@@ -98,7 +98,7 @@ class DetailTableViewController: UITableViewController {
                 print("invalid response")
             }
             tableView.reloadData()
-//            createHeaderView()
+            createHeaderView()
         }
     }
     
