@@ -17,7 +17,7 @@ class DetailTableViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-//        createHeaderView()
+        createHeaderView()
         getPersonInfo()
         
         tableView.delegate = self
@@ -132,7 +132,7 @@ class DetailTableViewController: UITableViewController {
             stackView.bottomAnchor.constraint(equalTo: tableView.tableHeaderView!.bottomAnchor, constant: -10)
         ])
         
-        tableView.reloadData()
+//        tableView.reloadData()
         
     }
     

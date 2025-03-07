@@ -86,14 +86,22 @@ class MainTableViewController: UITableViewController {
         cell.imageView?.image = images[indexPath.row]
         cell.imageView?.layer.cornerRadius = 10
         cell.imageView?.translatesAutoresizingMaskIntoConstraints = false
+        cell.textLabel?.translatesAutoresizingMaskIntoConstraints = false
+        cell.detailTextLabel?.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             cell.imageView!.centerYAnchor.constraint(equalTo: cell.centerYAnchor),
             cell.imageView!.leadingAnchor.constraint(equalTo: cell.leadingAnchor, constant: 20),
             cell.imageView!.widthAnchor.constraint(equalToConstant: 100),
-            cell.imageView!.heightAnchor.constraint(equalToConstant: 120)
+            cell.imageView!.heightAnchor.constraint(equalToConstant: 120),
+            cell.textLabel!.leadingAnchor.constraint(equalTo: cell.leadingAnchor, constant: 150),
+            cell.textLabel!.trailingAnchor.constraint(equalTo: cell.trailingAnchor, constant: -30),
+            cell.textLabel!.topAnchor.constraint(equalTo: cell.topAnchor, constant: 30),
+            cell.detailTextLabel!.leadingAnchor.constraint(equalTo: cell.textLabel!.leadingAnchor),
+            cell.detailTextLabel!.trailingAnchor.constraint(equalTo: cell.textLabel!.trailingAnchor),
+            cell.detailTextLabel!.topAnchor.constraint(lessThanOrEqualTo: cell.textLabel!.bottomAnchor, constant: 20),
+            cell.detailTextLabel!.bottomAnchor.constraint(greaterThanOrEqualTo: cell.bottomAnchor, constant: -30)
         ])
-        
-        cell.textLabel?.text = "\(notes[indexPath.row].name) \n \(notes[indexPath.row].forename)"
+        cell.textLabel?.text = "\(notes[indexPath.row].name)\n\(notes[indexPath.row].forename)"
         cell.detailTextLabel?.text = "\(notes[indexPath.row].dateOfBirth)"
         return cell
     }
