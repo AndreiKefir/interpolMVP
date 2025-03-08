@@ -8,6 +8,7 @@
 import UIKit
 
 class DetailTableViewController: UITableViewController {
+    var countries = Countries()
     var imagesString = [String]()
     var imagesData = [UIImage]()
     var person: PersonNotice?
@@ -84,10 +85,15 @@ class DetailTableViewController: UITableViewController {
                     let eyesString = eyesColors.joined(separator: ",")
                     showData[1].append(("Color of eyes", eyesString))
                 }
-                if person?.arrestWarrants != nil {
-                    let warrants = person?.arrestWarrants.first
-                    showData[2].append(("Wanted by", Locale.current.localizedString(forRegionCode: warrants?.issuingCountryID ?? "UK")))
-                    showData[2].append(("Charge", warrants?.charge))
+//                if person?.arrestWarrants != nil {
+//                    let warrants = person?.arrestWarrants.first
+//                    showData[2].append(("Wanted by", Locale.current.localizedString(forRegionCode: warrants?.issuingCountryID ?? "UK")))
+//                    showData[2].append(("Charge", warrants?.charge))
+//                }
+            
+                if let warrants = person?.arrestWarrants.first {
+                    showData[2].append(("Wanted by", countries.getCountryName(by: warrants.issuingCountryID ?? "UK")))
+                    showData[2].append(("Charge", warrants.charge))
                 }
                 
             } catch NetworkError.invalidUrl {

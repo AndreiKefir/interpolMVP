@@ -8,24 +8,40 @@
 import UIKit
 
 class ListSearchTableViewController: UITableViewController {
+    
+    var countryList = [String]()
 
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        getCountriesList()
         
+    }
+    
+    func getCountriesList() {
+        let localeIdentifiers = Locale.availableIdentifiers
+        for identifier in localeIdentifiers {
+            let locale = Locale(identifier: identifier)
+            if let country = locale.region?.identifier {
+                if !countryList.contains(country) {
+                    countryList.append(country)
+                }
+            }
+        }
+        print(countryList)
     }
 
     // MARK: - Table view data source
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        // #warning Incomplete implementation, return the number of rows
-        return 10
+        print(countryList.count)
+        return countryList.count
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "listCell", for: indexPath)
 
-        cell.textLabel?.text = "country"
+        cell.textLabel?.text = countryList[indexPath.row]
 
         return cell
     }
