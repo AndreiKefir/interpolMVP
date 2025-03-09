@@ -34,7 +34,7 @@ class DetailTableViewController: UITableViewController {
             do {
                 let result = try await NetworkManager.shared.getPerson(by: personID)
                 person = result
-                print("!!! \(personID)")
+//                print("!!! \(personID)")
                 guard let imagesLink = person?.links.images?.href else { return }
                     let resultImages = try await NetworkManager.shared.getPersonImages(by: imagesLink)
                 for image in resultImages.embedded.images {
@@ -179,6 +179,12 @@ class DetailTableViewController: UITableViewController {
         cell.detailTextLabel?.text = showData[indexPath.section][indexPath.row].1
         
         return cell
+    }
+    
+    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        if indexPath.section == 2 && indexPath.row == 1 {
+            return 100
+        } else { return 44 }
     }
     
 }

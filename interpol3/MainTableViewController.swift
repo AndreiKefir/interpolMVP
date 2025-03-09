@@ -47,7 +47,7 @@ class MainTableViewController: UITableViewController {
                 
                 let result = try await NetworkManager.shared.getNotices(by: NetworkManager.shared.createURL(by: NetworkManager.shared.searchQuery))
                 notes = result.embedded.notices
-                print("working")
+//                print("working")
                 
                 for note in notes {
                     thumbnails.append(note.links.thumbnail.href)
@@ -107,7 +107,7 @@ class MainTableViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let detailVC = storyboard?.instantiateViewController(withIdentifier: "detailVC") as! DetailTableViewController
         let personIDString = notes[indexPath.row].entityID.replacingOccurrences(of: "/", with: "-")
-        print(" ! \(personIDString)")
+//        print(" ! \(personIDString)")
         detailVC.personID = personIDString
         navigationController?.pushViewController(detailVC, animated: true)
     }

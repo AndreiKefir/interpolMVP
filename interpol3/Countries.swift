@@ -8,8 +8,7 @@
 import Foundation
 
 class Countries {
-    
-    let countriesList: [(countryName: String, countryCode: String)] = [
+    var countriesList: [(name: String, isoCode: String)] = [
         ("Afghanistan", "AF"),
         ("Albania", "AL"),
         ("Algeria", "DZ"),
@@ -206,30 +205,25 @@ class Countries {
         ("Zimbabwe", "ZW")
     ]
     
-//    func getCountryName(by countryCode: String) -> String {
-//        if let country = Locale.current.localizedString(forRegionCode: countryCode) {
-//            return country
-//        } else { return countryCode }
-//    }
-    
     func getCountryName(by countryCode: String) -> String {
         var countryName = "Unknown country"
-        for country in countriesList {
-            if country.countryCode == countryCode {
-                countryName = country.countryName
-            } else { return countryName}
+        for (name, isoCode) in countriesList {
+            if isoCode == countryCode {
+                countryName = name
+                break
+            }
         }
        return countryName
     }
     
     func getCountryCode(by countryName: String) -> String {
         var countryCode = "Unknown code"
-        for country in countriesList {
-            if country.countryName == countryName {
-                countryCode = country.countryCode
-            } else { return countryCode }
+        for (name, isoCode) in countriesList {
+            if name == countryName {
+                countryCode = isoCode
+                break
+            }
         }
         return countryCode
     }
 }
-

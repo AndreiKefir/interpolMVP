@@ -10,41 +10,49 @@ import UIKit
 class ListSearchTableViewController: UITableViewController {
     
     var countryList = [String]()
+    let countries = Countries()
 
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        getCountriesList()
+        countryList = countries.countriesList.map { $0.0 }
+    //    countriesList.map { $0.0 }
+ //       getCountriesList()
         
     }
     
-    func getCountriesList() {
-        let localeIdentifiers = Locale.availableIdentifiers
-        for identifier in localeIdentifiers {
-            let locale = Locale(identifier: identifier)
-            if let country = locale.region?.identifier {
-                if !countryList.contains(country) {
-                    countryList.append(country)
-                }
-            }
-        }
-        print(countryList)
-    }
+//    func getCountriesList() {
+//        let localeIdentifiers = Locale.availableIdentifiers
+//        for identifier in localeIdentifiers {
+//            let locale = Locale(identifier: identifier)
+//            if let country = locale.region?.identifier {
+//                if !countryList.contains(country) {
+//                    countryList.append(country)
+//                }
+//            }
+//        }
+//        print(countryList)
+//    }
 
     // MARK: - Table view data source
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        print(countryList.count)
         return countryList.count
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "listCell", for: indexPath)
-
         cell.textLabel?.text = countryList[indexPath.row]
-
         return cell
     }
+    
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        navigationController?.popViewController(animated: true)
+    }
+    
+//    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+//        <#code#>
+//    }
 
     /*
     // Override to support conditional editing of the table view.

@@ -26,7 +26,7 @@ class NetworkManager {
         components.queryItems = queries
    
         let url = components.url
-        print("---!!!\(url!)")
+//        print("---!!!\(url!)")
         return url ?? URL(string: "https://ws-public.interpol.int/notices/v1/red?forename=bob&resultPerPage=160")!
     }
     
@@ -49,7 +49,7 @@ class NetworkManager {
     func getPerson(by idString: String) async throws -> PersonNotice {
         let personString = "https://ws-public.interpol.int/notices/v1/red/"
         let string = personString + idString
-        print("-- ! \(string)")
+//        print("-- ! \(string)")
         guard let url = URL(string: string) else {
             throw NetworkError.invalidUrl
         }
@@ -57,7 +57,7 @@ class NetworkManager {
             let (data, response) = try await URLSession.shared.data(from: url)
             return try jsonDecoder.decode(PersonNotice.self, from: data)
         } catch {
-            print(" - !!! -")
+//            print(" - !!! -")
             throw NetworkError.invalidData
         }
     }
@@ -69,8 +69,8 @@ class NetworkManager {
         do {
             let (data, response) = try await URLSession.shared.data(from: url)
             if let httpResponse = response as? HTTPURLResponse {
-                print("code: \(httpResponse.statusCode)")
-                print("\(url)")
+//                print("code: \(httpResponse.statusCode)")
+//                print("\(url)")
             }
             return try jsonDecoder.decode(RedNotices.self, from: data)
         } catch {

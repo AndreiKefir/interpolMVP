@@ -93,6 +93,7 @@ class SearchTableViewController: UITableViewController, UITextFieldDelegate {
                 genderSegment.trailingAnchor.constraint(equalTo: cell.trailingAnchor, constant: -30)
             ])
         case 3:
+            cell.detailTextLabel?.text = "Some detail"
             cell.textLabel?.text = "Nation"
             cell.textLabel?.textAlignment = .center
             cell.accessoryType = .disclosureIndicator
