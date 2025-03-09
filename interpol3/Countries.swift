@@ -9,6 +9,7 @@ import Foundation
 
 class Countries {
     var countriesList: [(name: String, isoCode: String)] = [
+        ("", ""),
         ("Afghanistan", "AF"),
         ("Albania", "AL"),
         ("Algeria", "DZ"),
