@@ -26,7 +26,7 @@ class NetworkManager {
         components.queryItems = queries
    
         let url = components.url
-//        print("---!!!\(url!)")
+        print("---!!!\(url!)")
         return url ?? URL(string: "https://ws-public.interpol.int/notices/v1/red?forename=bob&resultPerPage=160")!
     }
     

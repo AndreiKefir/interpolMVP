@@ -9,6 +9,7 @@ import UIKit
 
 class MainTableViewController: UITableViewController {
     var notes: [Notice] = []
+    var numberOfNotices: Int?
     var thumbnails: [String] = []
     var images: [UIImage] = []
 
@@ -30,7 +31,7 @@ class MainTableViewController: UITableViewController {
              let headerLabel = UILabel()
              headerLabel.frame = CGRect(x: 0, y: 0, width: tableView.frame.width, height: 40)
              headerLabel.backgroundColor = .yellow
-             headerLabel.text = "some text info"
+             headerLabel.text = "found \(numberOfNotices ?? 0) persons"
              headerLabel.textAlignment = .center
              tableView.tableHeaderView = headerLabel
 
@@ -47,17 +48,30 @@ class MainTableViewController: UITableViewController {
                 
                 let result = try await NetworkManager.shared.getNotices(by: NetworkManager.shared.createURL(by: NetworkManager.shared.searchQuery))
                 notes = result.embedded.notices
-//                print("working")
-                
+                numberOfNotices = result.total
+//                for note in notes {
+//                    if let link = note.links.thumbnail?.href {
+//                        thumbnails.append(link)
+//                    } else {
+//                        images.append(UIImage(named: "person")!)
+//                    }
+//                }
+//                for element in thumbnails {
+//                    let thumbnailData = try await NetworkManager.shared.getImageNow(by: element)
+//                    if let image = UIImage(data: thumbnailData) {
+//                        images.append(image)
+//                    }
+//                }
                 for note in notes {
-                    thumbnails.append(note.links.thumbnail.href)
-                }
-                for element in thumbnails {
-                    let thumbnailData = try await NetworkManager.shared.getImageNow(by: element)
-                    if let image = UIImage(data: thumbnailData) {
-                        images.append(image)
+                    if let link = note.links.thumbnail?.href {
+                        if let photo = try await UIImage(data: NetworkManager.shared.getImageNow(by: link)) {
+                            images.append(photo)
+                        }
+                    } else {
+                        images.append(UIImage(named: "person")!)
                     }
                 }
+                
             } catch NetworkError.invalidUrl {
                 print("??? invalid URL ???")
             } catch NetworkError.invalidData {
@@ -93,8 +107,8 @@ class MainTableViewController: UITableViewController {
             cell.textLabel!.leadingAnchor.constraint(equalTo: cell.leadingAnchor, constant: 150),
             cell.textLabel!.trailingAnchor.constraint(equalTo: cell.trailingAnchor, constant: -30),
             cell.textLabel!.topAnchor.constraint(equalTo: cell.topAnchor, constant: 30),
-            cell.detailTextLabel!.leadingAnchor.constraint(equalTo: cell.textLabel!.leadingAnchor),
-            cell.detailTextLabel!.trailingAnchor.constraint(equalTo: cell.textLabel!.trailingAnchor),
+            cell.detailTextLabel!.leadingAnchor.constraint(equalTo: cell.leadingAnchor, constant: 150),
+            cell.detailTextLabel!.trailingAnchor.constraint(equalTo: cell.trailingAnchor, constant: -30),
             cell.detailTextLabel!.topAnchor.constraint(lessThanOrEqualTo: cell.textLabel!.bottomAnchor, constant: 20),
             cell.detailTextLabel!.bottomAnchor.constraint(greaterThanOrEqualTo: cell.bottomAnchor, constant: -30)
         ])
@@ -107,7 +121,6 @@ class MainTableViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let detailVC = storyboard?.instantiateViewController(withIdentifier: "detailVC") as! DetailTableViewController
         let personIDString = notes[indexPath.row].entityID.replacingOccurrences(of: "/", with: "-")
-//        print(" ! \(personIDString)")
         detailVC.personID = personIDString
         navigationController?.pushViewController(detailVC, animated: true)
     }
@@ -116,12 +129,15 @@ class MainTableViewController: UITableViewController {
     @objc func openSearchVC() {
         let searchVC = storyboard?.instantiateViewController(withIdentifier: "searchVC") as! SearchTableViewController
         navigationController?.pushViewController(searchVC, animated: true)
+        thumbnails.removeAll()
+        images.removeAll()
+        notes.removeAll()
     }
     
     func calculateAge(from birthDate: String) -> String {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy/MM/dd"
-        guard let date = dateFormatter.date(from: birthDate) else { return "" }
+        guard let date = dateFormatter.date(from: birthDate) else { return "   " }
         let components = Calendar.current.dateComponents([.year], from: date, to: Date())
         return "\(components.year ?? 0) years old"
     }

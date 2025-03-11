@@ -207,7 +207,7 @@ class Countries {
     ]
     
     func getCountryName(by countryCode: String) -> String {
-        var countryName = "Unknown country"
+        var countryName = ""
         for (name, isoCode) in countriesList {
             if isoCode == countryCode {
                 countryName = name
@@ -218,7 +218,7 @@ class Countries {
     }
     
     func getCountryCode(by countryName: String) -> String {
-        var countryCode = "Unknown code"
+        var countryCode = ""
         for (name, isoCode) in countriesList {
             if name == countryName {
                 countryCode = isoCode

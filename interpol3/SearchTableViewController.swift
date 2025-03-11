@@ -17,6 +17,8 @@ class SearchTableViewController: UITableViewController, UITextFieldDelegate {
     
     var selectedNationality = "All"
     var selectedCountry = "All"
+    var searchQuery = [URLQueryItem]()
+    var countries = Countries()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -34,6 +36,12 @@ class SearchTableViewController: UITableViewController, UITextFieldDelegate {
         super.viewWillAppear(animated)
         detailNationalityLabel.text = selectedNationality
         detailCountryLabel.text = selectedCountry
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        NetworkManager.shared.searchQuery = createQuery()
+        print("search closed")
     }
     
     @objc func dismissKeyboard() {
@@ -63,9 +71,37 @@ class SearchTableViewController: UITableViewController, UITextFieldDelegate {
         }
     }
     
-//    func textFieldDidEndEditing(_ textField: UITextField) {
-//        textField.resignFirstResponder()
-//    }
+    func createQuery() -> [URLQueryItem] {
+        var queryItems = [URLQueryItem]()
+        
+        if !forenameTextField.text!.isEmpty {
+            let forenameQuery = URLQueryItem(name: "forename", value: forenameTextField.text)
+            queryItems.append(forenameQuery)
+        }
+        if !familyNameTextField.text!.isEmpty {
+            let familyNameQuery = URLQueryItem(name: "name", value: familyNameTextField.text)
+            queryItems.append(familyNameQuery)
+        }
+        if genderSegment.selectedSegmentIndex == 1 {
+            let genderQuery = URLQueryItem(name: "sexId", value: "M")
+            queryItems.append(genderQuery)
+        }
+        if genderSegment.selectedSegmentIndex == 2 {
+            let genderQuery = URLQueryItem(name: "sexId", value: "F")
+            queryItems.append(genderQuery)
+        }
+        if countries.countriesList.contains(where: { $0.name == detailNationalityLabel.text }) {
+            let nationalityQuery = URLQueryItem(name: "nationality", value: countries.getCountryCode(by: detailNationalityLabel.text!))
+            queryItems.append(nationalityQuery)
+        }
+        if countries.countriesList.contains(where: { $0.name == detailCountryLabel.text }) {
+            let countryQuery = URLQueryItem(name: "arrestWarrantCountryId", value: countries.getCountryCode(by: detailCountryLabel.text!))
+            queryItems.append(countryQuery)
+        }
+        searchQuery = queryItems
+        print("query = \(queryItems)")
+        return queryItems
+    }
     
 }
 
