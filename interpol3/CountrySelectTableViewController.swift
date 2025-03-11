@@ -13,35 +13,65 @@ protocol CountrySelectDelegate: AnyObject {
 
 class CountrySelectTableViewController: UITableViewController {
     weak var delegate: CountrySelectDelegate?
-
-    var countryList = [String]()
     let countries = Countries()
-    var numberOfSelectedCell = Int()
+    var countryList = [String]()
+    var filteredCounries: [String] = []
+    var selectedCountry: String?
+    
+    let searchController = UISearchController(searchResultsController: nil)
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         countryList = countries.countriesList.map { $0.0 }
-        //    countriesList.map { $0.0 }
         
+        searchController.searchResultsUpdater = self
+        searchController.obscuresBackgroundDuringPresentation = false
+        searchController.searchBar.placeholder = "Search Country"
+        searchController.automaticallyShowsCancelButton = true
+        
+        navigationItem.searchController = searchController
+        definesPresentationContext = true
+        
+        filteredCounries = countryList
     }
-
-    // MARK: - Table view data source
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        countryList.count
+        return filteredCounries.count
     }
-
+    
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "countryCell", for: indexPath)
-        cell.textLabel?.text = countryList[indexPath.row]
-
+        cell.textLabel?.text = filteredCounries[indexPath.row]
+        
         return cell
     }
     
+    
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        delegate?.didSelectCountry(country: countryList[indexPath.row])
+//        let selectedCell = tableView.cellForRow(at: indexPath)
+//        if selectedCountry == countryList[indexPath.row] {
+//            selectedCell?.accessoryType = .none
+//        } else {
+//            selectedCountry = countryList[indexPath.row]
+//            selectedCell?.accessoryType = .checkmark
+//        }
+        
+        delegate?.didSelectCountry(country: filteredCounries[indexPath.row])
         navigationController?.popViewController(animated: true)
     }
+    
+}
 
+extension CountrySelectTableViewController: UISearchResultsUpdating {
+    func updateSearchResults(for searchController: UISearchController) {
+        guard let searchText = searchController.searchBar.text else { return }
+        
+        if searchText.isEmpty {
+            filteredCounries = countryList
+        } else {
+            filteredCounries = countryList.filter { $0.lowercased().contains(searchText.lowercased())
+            }
+        }
+        tableView.reloadData()
+    }
 }

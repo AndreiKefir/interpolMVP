@@ -54,8 +54,8 @@
                         <barButtonItem key="backBarButtonItem" title="Search" id="Y4c-qi-9Fd"/>
                     </navigationItem>
                     <connections>
-                        <segue destination="8LQ-NI-e9w" kind="show" identifier="detailVC" id="Fst-0J-0SJ"/>
-                        <segue destination="GWc-Tr-nqj" kind="show" identifier="searchVC" id="EoE-WK-1jc"/>
+                        <segue destination="8LQ-NI-e9w" kind="show" identifier="toDetailVC" id="Fst-0J-0SJ"/>
+                        <segue destination="GWc-Tr-nqj" kind="show" identifier="toSearchVC" id="EoE-WK-1jc"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="H42-sK-gtf" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
@@ -83,7 +83,7 @@
                                                 <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="248" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Forename" textAlignment="center" minimumFontSize="17" clearButtonMode="whileEditing" translatesAutoresizingMaskIntoConstraints="NO" id="KZX-Jt-2QZ">
                                                     <rect key="frame" x="30" y="5" width="333" height="34"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                                    <textInputTraits key="textInputTraits" returnKeyType="search" textContentType="name"/>
+                                                    <textInputTraits key="textInputTraits" keyboardType="namePhonePad" returnKeyType="search" textContentType="name"/>
                                                 </textField>
                                             </subviews>
                                             <constraints>
@@ -108,7 +108,7 @@
                                                 <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="248" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Family name" textAlignment="center" minimumFontSize="17" clearButtonMode="whileEditing" translatesAutoresizingMaskIntoConstraints="NO" id="I3t-sF-dgh">
                                                     <rect key="frame" x="30" y="5" width="333" height="34"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                                    <textInputTraits key="textInputTraits" returnKeyType="search" textContentType="name"/>
+                                                    <textInputTraits key="textInputTraits" keyboardType="namePhonePad" returnKeyType="search" textContentType="name"/>
                                                 </textField>
                                             </subviews>
                                             <constraints>
@@ -236,21 +236,9 @@
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                        <searchBar key="tableHeaderView" contentMode="redraw" showsCancelButton="YES" id="VpD-BR-YNX">
-                            <rect key="frame" x="0.0" y="0.0" width="393" height="56"/>
-                            <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
-                            <textInputTraits key="textInputTraits" keyboardType="namePhonePad" returnKeyType="search" textContentType="country-name"/>
-                            <scopeButtonTitles>
-                                <string>Title</string>
-                                <string>Title</string>
-                            </scopeButtonTitles>
-                            <connections>
-                                <outlet property="delegate" destination="sp0-6h-6K3" id="LAM-N1-Vcw"/>
-                            </connections>
-                        </searchBar>
                         <prototypes>
-                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="listCell" id="hoO-l3-Pza">
-                                <rect key="frame" x="0.0" y="106" width="393" height="43.666667938232422"/>
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="countryCell" id="hoO-l3-Pza">
+                                <rect key="frame" x="0.0" y="50" width="393" height="43.666667938232422"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="hoO-l3-Pza" id="AxL-gX-k1z">
                                     <rect key="frame" x="0.0" y="0.0" width="393" height="43.666667938232422"/>
@@ -340,21 +328,9 @@
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                        <searchBar key="tableHeaderView" contentMode="redraw" showsCancelButton="YES" id="pgA-Ky-TU5">
-                            <rect key="frame" x="0.0" y="0.0" width="393" height="56"/>
-                            <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
-                            <textInputTraits key="textInputTraits" keyboardType="namePhonePad" returnKeyType="search" textContentType="country-name"/>
-                            <scopeButtonTitles>
-                                <string>Title</string>
-                                <string>Title</string>
-                            </scopeButtonTitles>
-                            <connections>
-                                <outlet property="delegate" destination="uld-fi-Jaf" id="WuI-cT-RWd"/>
-                            </connections>
-                        </searchBar>
                         <prototypes>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="countryCell" id="hbf-Nn-1pH">
-                                <rect key="frame" x="0.0" y="106" width="393" height="43.666667938232422"/>
+                                <rect key="frame" x="0.0" y="50" width="393" height="43.666667938232422"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="hbf-Nn-1pH" id="D57-TR-RHY">
                                     <rect key="frame" x="0.0" y="0.0" width="393" height="43.666667938232422"/>
