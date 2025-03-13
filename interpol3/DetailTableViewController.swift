@@ -8,6 +8,7 @@
 import UIKit
 
 class DetailTableViewController: UITableViewController {
+    let myBlueColor = #colorLiteral(red: 0, green: 0.1617512107, blue: 0.4071177244, alpha: 1)
     var countries = Countries()
     var imagesString = [String]()
     var imagesData = [UIImage]()
@@ -105,7 +106,7 @@ class DetailTableViewController: UITableViewController {
     
     func createHeaderView() {
         tableView.tableHeaderView = UIView(frame: CGRect(x: 0, y: 0, width: view.frame.size.width, height: 160))
-        tableView.tableHeaderView?.backgroundColor = .systemBlue
+        tableView.tableHeaderView?.backgroundColor = myBlueColor
     
         //stackView
         let stackView = UIStackView()
@@ -177,7 +178,7 @@ class DetailTableViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         if indexPath.section == 2 && indexPath.row == 1 {
-            return 100
+            return 120
         } else { return 44 }
     }
     
