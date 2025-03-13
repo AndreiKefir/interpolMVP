@@ -17,24 +17,10 @@ class MainTableViewController: UITableViewController {
         super.viewDidLoad()
 //        title = "INTERPOL"
         
-        // Uncomment the following line to preserve selection between presentations
-        // self.clearsSelectionOnViewWillAppear = false
-
-        // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-        // self.navigationItem.rightBarButtonItem = self.editButtonItem
-        
-        //        self.navigationItem.rightBarButtonItem = self.editButtonItem
-        //       self.navigationItem.rightBarButtonItem = self.editButtonItem
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .search, target: self, action: #selector(openSearchVC))
         
-             tableView.rowHeight = 160
-             let headerLabel = UILabel()
-             headerLabel.frame = CGRect(x: 0, y: 0, width: tableView.frame.width, height: 40)
-             headerLabel.backgroundColor = .yellow
-             headerLabel.text = "found \(numberOfNotices ?? 0) persons"
-             headerLabel.textAlignment = .center
-             tableView.tableHeaderView = headerLabel
-
+        createHeader()
+        tableView.rowHeight = 160
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -49,19 +35,7 @@ class MainTableViewController: UITableViewController {
                 let result = try await NetworkManager.shared.getNotices(by: NetworkManager.shared.createURL(by: NetworkManager.shared.searchQuery))
                 notes = result.embedded.notices
                 numberOfNotices = result.total
-//                for note in notes {
-//                    if let link = note.links.thumbnail?.href {
-//                        thumbnails.append(link)
-//                    } else {
-//                        images.append(UIImage(named: "person")!)
-//                    }
-//                }
-//                for element in thumbnails {
-//                    let thumbnailData = try await NetworkManager.shared.getImageNow(by: element)
-//                    if let image = UIImage(data: thumbnailData) {
-//                        images.append(image)
-//                    }
-//                }
+                
                 for note in notes {
                     if let link = note.links.thumbnail?.href {
                         if let photo = try await UIImage(data: NetworkManager.shared.getImageNow(by: link)) {
@@ -83,8 +57,16 @@ class MainTableViewController: UITableViewController {
         }
         
     }
+    
+    func createHeader() {
+        let headerLabel = UILabel()
+        headerLabel.frame = CGRect(x: 0, y: 0, width: tableView.frame.width, height: 40)
+        headerLabel.backgroundColor = .yellow
+        headerLabel.text = "found \(numberOfNotices ?? 0) persons"
+        headerLabel.textAlignment = .center
+        tableView.tableHeaderView = headerLabel
+    }
 
-    // MARK: - Table view data source
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return notes.count
@@ -125,7 +107,6 @@ class MainTableViewController: UITableViewController {
         navigationController?.pushViewController(detailVC, animated: true)
     }
         
-    
     @objc func openSearchVC() {
         let searchVC = storyboard?.instantiateViewController(withIdentifier: "searchVC") as! SearchTableViewController
         navigationController?.pushViewController(searchVC, animated: true)
@@ -141,53 +122,5 @@ class MainTableViewController: UITableViewController {
         let components = Calendar.current.dateComponents([.year], from: date, to: Date())
         return "\(components.year ?? 0) years old"
     }
-    
-    
-
-
-    /*
-    // Override to support conditional editing of the table view.
-    override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the specified item to be editable.
-        return true
-    }
-    */
-
-    /*
-    // Override to support editing the table view.
-    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
-        if editingStyle == .delete {
-            // Delete the row from the data source
-            tableView.deleteRows(at: [indexPath], with: .fade)
-        } else if editingStyle == .insert {
-            // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-        }    
-    }
-    */
-
-    /*
-    // Override to support rearranging the table view.
-    override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
-
-    }
-    */
-
-    /*
-    // Override to support conditional rearranging of the table view.
-    override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the item to be re-orderable.
-        return true
-    }
-    */
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
-    }
-    */
 
 }

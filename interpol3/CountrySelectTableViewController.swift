@@ -23,6 +23,7 @@ class CountrySelectTableViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         countryList = countries.countriesList.map { $0.0 }
+        countryList.insert("All", at: 0)
         
         searchController.searchResultsUpdater = self
         searchController.obscuresBackgroundDuringPresentation = false

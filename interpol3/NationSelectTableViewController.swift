@@ -1,5 +1,5 @@
 //
-//  ListSearchTableViewController.swift
+//  NationSelectTableViewController.swift
 //  interpol3
 //
 //  Created by Andy Kefir on 08/03/2025.
@@ -23,6 +23,7 @@ class NationSelectTableViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         countryList = countries.countriesList.map { $0.0 }
+        countryList.insert("All", at: 0)
         
         searchController.searchResultsUpdater = self
         searchController.obscuresBackgroundDuringPresentation = false
@@ -45,7 +46,6 @@ class NationSelectTableViewController: UITableViewController {
         
         return cell
     }
-    
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
 //        let selectedCell = tableView.cellForRow(at: indexPath)
