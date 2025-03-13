@@ -10,39 +10,82 @@ import UIKit
 class MainTableViewController: UITableViewController {
     var notes: [Notice] = []
     var numberOfNotices: Int?
-    var thumbnails: [String] = []
+    var nextURLString: String?
     var images: [UIImage] = []
+    var isLoading = false
+    var isDataLoaded = false
 
     override func viewDidLoad() {
         super.viewDidLoad()
 //        title = "INTERPOL"
         
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .search, target: self, action: #selector(openSearchVC))
-        
-        createHeader()
         tableView.rowHeight = 160
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+  
         showNotices()
     }
     
+    
     func showNotices() {
+        guard !isLoading else { return }
+        isLoading = true
         Task {
             do {
-                
-                let result = try await NetworkManager.shared.getNotices(by: NetworkManager.shared.createURL(by: NetworkManager.shared.searchQuery))
-                notes = result.embedded.notices
-                numberOfNotices = result.total
-                
-                for note in notes {
-                    if let link = note.links.thumbnail?.href {
-                        if let photo = try await UIImage(data: NetworkManager.shared.getImageNow(by: link)) {
-                            images.append(photo)
+                print("start load")
+                if nextURLString != nil {
+                    if let url = URL(string: nextURLString!) {
+                        let result = try await NetworkManager.shared.getNotices(by: url)
+                        let newNotes = result.embedded.notices
+                        notes.append(contentsOf: newNotes)
+                        print("+++ \(notes.count)")
+                        if let newNextURLString = result.links.next?.href {
+                            if newNextURLString != nextURLString {
+                                nextURLString = newNextURLString
+                                print("add NEW nextlink")
+                            } else {
+                                nextURLString = nil
+                                print("  reset NEW link")
+                            }
+                        } else {
+                            nextURLString = nil
+                            print("nil reset2 new link")
                         }
-                    } else {
-                        images.append(UIImage(named: "person")!)
+                        print("-1")
+                        for note in newNotes {
+                            if let link = note.links.thumbnail?.href {
+                                if let photo = try await UIImage(data: NetworkManager.shared.getImageNow(by: link)) {
+                                    images.append(photo)
+                                    print("-2  \(images.count)")
+                                }
+                            } else {
+                                images.append(UIImage(named: "person")!)
+                            }
+                        }
+                    }
+                }
+                print("-3")
+                if !isDataLoaded {
+                    print("-4")
+                    let result = try await NetworkManager.shared.getNotices(by: NetworkManager.shared.createURL(by: NetworkManager.shared.searchQuery))
+                    notes = result.embedded.notices
+                    numberOfNotices = result.total
+                    isDataLoaded = true
+                    if let nextLink = result.links.next?.href {
+                        nextURLString = nextLink
+                        print("add nextlink")
+                    }
+                    for note in notes {
+                        if let link = note.links.thumbnail?.href {
+                            if let photo = try await UIImage(data: NetworkManager.shared.getImageNow(by: link)) {
+                                images.append(photo)
+                            }
+                        } else {
+                            images.append(UIImage(named: "person")!)
+                        }
                     }
                 }
                 
@@ -53,20 +96,23 @@ class MainTableViewController: UITableViewController {
             } catch NetworkError.invalidResponse {
                 print("??? invalid response ???")
             }
+            createHeader()
+            print("here!!!!")
             tableView.reloadData()
+            isLoading = false
+            print(notes.count)
         }
-        
+
     }
     
     func createHeader() {
         let headerLabel = UILabel()
-        headerLabel.frame = CGRect(x: 0, y: 0, width: tableView.frame.width, height: 40)
+        headerLabel.frame = CGRect(x: 0, y: 0, width: tableView.frame.width, height: 30)
         headerLabel.backgroundColor = .yellow
-        headerLabel.text = "found \(numberOfNotices ?? 0) persons"
+        headerLabel.text = "\(numberOfNotices ?? 0) persons found"
         headerLabel.textAlignment = .center
         tableView.tableHeaderView = headerLabel
     }
-
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return notes.count
@@ -78,6 +124,7 @@ class MainTableViewController: UITableViewController {
         cell.backgroundColor = .systemBlue
         cell.imageView?.image = images[indexPath.row]
         cell.imageView?.layer.cornerRadius = 10
+        cell.imageView?.contentMode = .scaleAspectFill
         cell.imageView?.translatesAutoresizingMaskIntoConstraints = false
         cell.textLabel?.translatesAutoresizingMaskIntoConstraints = false
         cell.detailTextLabel?.translatesAutoresizingMaskIntoConstraints = false
@@ -106,13 +153,24 @@ class MainTableViewController: UITableViewController {
         detailVC.personID = personIDString
         navigationController?.pushViewController(detailVC, animated: true)
     }
+    
+    override func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        if scrollView.contentOffset.y > scrollView.contentSize.height - scrollView.frame.size.height {
+            if !isLoading && nextURLString != nil {
+                print("try")
+                showNotices()
+            }
+        }
+    }
         
     @objc func openSearchVC() {
         let searchVC = storyboard?.instantiateViewController(withIdentifier: "searchVC") as! SearchTableViewController
         navigationController?.pushViewController(searchVC, animated: true)
-        thumbnails.removeAll()
         images.removeAll()
         notes.removeAll()
+        nextURLString = nil
+        isLoading = false
+        isDataLoaded = false
     }
     
     func calculateAge(from birthDate: String) -> String {

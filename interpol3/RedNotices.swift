@@ -57,9 +57,10 @@ struct First: Codable {
 
 struct RedNoticesLinks: Codable {
     let linksSelf, first, last: First
+    let next: First?
 
     enum CodingKeys: String, CodingKey {
         case linksSelf = "self"
-        case first, last
+        case first, last, next
     }
 }

@@ -9,7 +9,7 @@ import Foundation
 
 struct PersonNotice: Codable {
     let arrestWarrants: [ArrestWarrant]
-    let weight: Int?
+    let weight: Double?
     let forename, dateOfBirth, entityID: String
     let languagesSpokenIDS, nationalities: [String]?
     let height: Double?

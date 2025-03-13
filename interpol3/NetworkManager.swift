@@ -27,7 +27,7 @@ class NetworkManager {
    
         let url = components.url
         print("---!!!\(url!)")
-        return url ?? URL(string: "https://ws-public.interpol.int/notices/v1/red?forename=bob&resultPerPage=160")!
+        return url ?? URL(string: "https://ws-public.interpol.int/notices/v1/red?")!
     }
     
     func getImageNow(by urlString: String) async throws -> Data {
