@@ -1,5 +1,5 @@
 //
-//  RedNotices.swift
+//  Notices.swift
 //  interpol3
 //
 //  Created by Andy Kefir on 06/03/2025.
@@ -8,7 +8,7 @@
 import Foundation
 
 
-struct RedNotices: Codable {
+struct Notices: Codable {
     let total: Int
     let embedded: Embedded
     let links: RedNoticesLinks

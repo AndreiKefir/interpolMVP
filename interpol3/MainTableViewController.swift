@@ -35,8 +35,7 @@ class MainTableViewController: UITableViewController {
     }
     
     override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-  
+        super.viewWillAppear(animated)  
         showNotices()
     }
     
@@ -49,28 +48,25 @@ class MainTableViewController: UITableViewController {
                 print("start load")
                 if nextURLString != nil {
                     if let url = URL(string: nextURLString!) {
-                        let result = try await NetworkManager.shared.getNotices(by: url)
+                        let result = try await Networker.shared.fetchNoticesData(by: url)
                         let newNotes = result.embedded.notices
                         notes.append(contentsOf: newNotes)
-                        print("+++ \(notes.count)")
+//                        print("+++ \(notes.count)")
                         if let newNextURLString = result.links.next?.href {
                             if newNextURLString != nextURLString {
                                 nextURLString = newNextURLString
-                                print("add NEW nextlink")
                             } else {
                                 nextURLString = nil
-                                print("  reset NEW link")
                             }
                         } else {
                             nextURLString = nil
-                            print("nil reset2 new link")
                         }
-                        print("-1")
                         for note in newNotes {
-                            if let link = note.links.thumbnail?.href {
-                                if let photo = try await UIImage(data: NetworkManager.shared.getImageNow(by: link)) {
-                                    images.append(photo)
-                                    print("-2  \(images.count)")
+                            if let imageLink = note.links.thumbnail?.href {
+                                if let imageData = try await Networker.shared.fetchImageData(from: imageLink) {
+                                    if let image = UIImage(data: imageData) {
+                                        images.append(image)
+                                    }
                                 }
                             } else {
                                 images.append(UIImage(named: "person")!)
@@ -78,21 +74,20 @@ class MainTableViewController: UITableViewController {
                         }
                     }
                 }
-                print("-3")
                 if !isDataLoaded {
-                    print("-4")
-                    let result = try await NetworkManager.shared.getNotices(by: NetworkManager.shared.createURL(by: NetworkManager.shared.searchQuery))
+                    let result = try await Networker.shared.fetchNoticesData(by: Networker.shared.createURL(by: Networker.shared.searchQuery))
                     notes = result.embedded.notices
                     numberOfNotices = result.total
                     isDataLoaded = true
                     if let nextLink = result.links.next?.href {
                         nextURLString = nextLink
-                        print("add nextlink")
                     }
                     for note in notes {
-                        if let link = note.links.thumbnail?.href {
-                            if let photo = try await UIImage(data: NetworkManager.shared.getImageNow(by: link)) {
-                                images.append(photo)
+                        if let imageLink = note.links.thumbnail?.href {
+                            if let imageData = try await Networker.shared.fetchImageData(from: imageLink) {
+                                if let image = UIImage(data: imageData) {
+                                    images.append(image)
+                                }
                             }
                         } else {
                             images.append(UIImage(named: "person")!)
@@ -100,18 +95,21 @@ class MainTableViewController: UITableViewController {
                     }
                 }
                 
-            } catch NetworkError.invalidUrl {
+            } catch NetworkerError.invalidUrl {
                 print("??? invalid URL ???")
-            } catch NetworkError.invalidData {
+            } catch NetworkerError.invalidData {
                 print("??? invalid Data ???")
-            } catch NetworkError.invalidResponse {
+            } catch NetworkerError.invalidImageData {
+                print("??? invalid image Data ???")
+            } catch NetworkerError.invalidResponse {
                 print("??? invalid response ???")
+            } catch NetworkerError.invalidImageUrl {
+                print("??? invalid image URL ???")
             }
             createHeader()
-            print("here!!!!")
             tableView.reloadData()
             isLoading = false
-            print(notes.count)
+//            print(notes.count)
         }
 
     }

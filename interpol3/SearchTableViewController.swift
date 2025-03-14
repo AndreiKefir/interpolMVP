@@ -40,7 +40,7 @@ class SearchTableViewController: UITableViewController, UITextFieldDelegate {
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        NetworkManager.shared.searchQuery = createQuery()
+        Networker.shared.searchQuery = createQuery()
         print("search closed")
     }
     

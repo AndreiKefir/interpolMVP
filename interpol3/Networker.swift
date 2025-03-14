@@ -7,18 +7,17 @@
 
 import Foundation
 
-class NetworkManager {
-    static var shared = NetworkManager()
-    private init() { }
-    
-    var jsonDecoder: JSONDecoder = {
-        JSONDecoder()
-    }()
-    
+class Networker {
+    static let shared = Networker()
+    private let session: URLSession
     var searchQuery: [URLQueryItem] = []
     
-    func createURL(by queries: [URLQueryItem]) -> URL {
+    private init() {
+        let config = URLSessionConfiguration.default
+        session = URLSession(configuration: config)
+    }
     
+    func createURL(by queries: [URLQueryItem]) -> URL {
         var components = URLComponents()
         components.scheme = "https"
         components.host = "ws-public.interpol.int"
@@ -30,20 +29,32 @@ class NetworkManager {
         return url ?? URL(string: "https://ws-public.interpol.int/notices/v1/red?")!
     }
     
-    func getImageNow(by urlString: String) async throws -> Data {
+//    func fetchImageData(by urlString: String) async throws -> Data {
+//        guard let url = URL(string: urlString) else {
+//            throw NetworkerError.invalidUrl
+//        }
+//        return try Data(contentsOf: url)
+//    }
+    func fetchImageData(from urlString: String) async throws -> Data? {
         guard let url = URL(string: urlString) else {
-            throw NetworkError.invalidUrl
+            throw NetworkerError.invalidImageUrl
         }
-        return try Data(contentsOf: url)
+        do {
+            let (data, _) = try await session.data(from: url)
+            return data
+        } catch {
+            throw NetworkerError.invalidImageData
+        }
+//        return try Data(contentsOf: url)
     }
-    
+     
 
     func getPersonImages(by imagesLink: String) async throws -> PersonImages {
         guard let url = URL(string: imagesLink) else {
-            throw NetworkError.invalidUrl
+            throw NetworkerError.invalidUrl
         }
-        let (data, response) = try await URLSession.shared.data(from: url)
-        return try jsonDecoder.decode(PersonImages.self, from: data)
+        let (data, _) = try await session.data(from: url)
+        return try JSONDecoder().decode(PersonImages.self, from: data)
     }
     
     func getPerson(by idString: String) async throws -> PersonNotice {
@@ -51,38 +62,40 @@ class NetworkManager {
         let string = personString + idString
 //        print("-- ! \(string)")
         guard let url = URL(string: string) else {
-            throw NetworkError.invalidUrl
+            throw NetworkerError.invalidUrl
         }
         do {
-            let (data, response) = try await URLSession.shared.data(from: url)
-            return try jsonDecoder.decode(PersonNotice.self, from: data)
+            let (data, response) = try await session.data(from: url)
+            return try JSONDecoder().decode(PersonNotice.self, from: data)
         } catch {
 //            print(" - !!! -")
-            throw NetworkError.invalidData
+            throw NetworkerError.invalidData
         }
     }
     
-    func getNotices(by url: URL) async throws -> RedNotices {
+    func fetchNoticesData(by url: URL) async throws -> Notices {
 //        guard let url = URL(string: "https://ws-public.interpol.int/notices/v1/red?resultPerPage=20") else {
 //            throw NetworkError.invalidUrl
  //       }
         do {
-            let (data, response) = try await URLSession.shared.data(from: url)
+            let (data, response) = try await session.data(from: url)
             if let httpResponse = response as? HTTPURLResponse {
 //                print("code: \(httpResponse.statusCode)")
 //                print("\(url)")
             }
-            return try jsonDecoder.decode(RedNotices.self, from: data)
+            return try JSONDecoder().decode(Notices.self, from: data)
         } catch {
-            throw NetworkError.invalidData
+            throw NetworkerError.invalidData
         }
     }
 }
 
-enum NetworkError: Error {
+enum NetworkerError: Error {
         case invalidUrl
+        case invalidImageUrl
         case invalidRequest
         case invalidResponse
         case invalidData
+        case invalidImageData
 }
    

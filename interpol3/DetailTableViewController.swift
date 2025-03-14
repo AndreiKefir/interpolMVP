@@ -33,17 +33,18 @@ class DetailTableViewController: UITableViewController {
     func getPersonInfo() {
         Task {
             do {
-                let result = try await NetworkManager.shared.getPerson(by: personID)
+                let result = try await Networker.shared.getPerson(by: personID)
                 person = result
 //                print("!!! \(personID)")
                 guard let imagesLink = person?.links.images?.href else { return }
-                    let resultImages = try await NetworkManager.shared.getPersonImages(by: imagesLink)
+                    let resultImages = try await Networker.shared.getPersonImages(by: imagesLink)
                 for image in resultImages.embedded.images {
                     imagesString.append(image.links.linksSelf.href)
                 }
                 for imageString in imagesString {
-                    let imageData = try await NetworkManager.shared.getImageNow(by: imageString)
-                    imagesData.append(UIImage(data: imageData)!)
+                    if let imageData = try await Networker.shared.fetchImageData(from: imageString) {
+                        imagesData.append(UIImage(data: imageData)!)
+                    }
                 }
                 
                 showData[0].append(("Family name", person?.name ?? "No name"))
@@ -91,11 +92,11 @@ class DetailTableViewController: UITableViewController {
                     showData[2].append(("Charge", warrants.charge))
                 }
                 
-            } catch NetworkError.invalidUrl {
+            } catch NetworkerError.invalidUrl {
                 print("invalid URL")
-            } catch NetworkError.invalidData {
+            } catch NetworkerError.invalidData {
                 print("invalid Data")
-            } catch NetworkError.invalidResponse {
+            } catch NetworkerError.invalidResponse {
                 print("invalid response")
             }
             tableView.reloadData()
