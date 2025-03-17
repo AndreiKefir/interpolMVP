@@ -8,29 +8,44 @@
 import UIKit
 
 class MainTableViewController: UITableViewController {
-    let myBlueColor = #colorLiteral(red: 0, green: 0.1617512107, blue: 0.4071177244, alpha: 1)
+    private let myBlueColor = #colorLiteral(red: 0, green: 0.1617512107, blue: 0.4071177244, alpha: 1)
     var notes: [Notice] = []
-    var numberOfNotices: Int?
+    var numberOfNotices: Int? {
+        didSet {
+            createHeader()
+        }
+    }
+    let countries = Countries()
     var nextURLString: String?
-    var images: [UIImage] = []
+    var images: [UIImage?] = []
     var isLoading = false
     var isDataLoaded = false
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        configureView()
+        createHeader()
+        
+    }
+    
+    func configureView() {
         title = "INTERPOL"
-        
-//        let backgroundImage = UIImageView(frame: self.tableView.bounds)
-//        backgroundImage.image = UIImage(named: "fon")
-//        backgroundImage.contentMode = .scaleAspectFill
-//        self.tableView.backgroundView = backgroundImage
-        
         navigationController?.navigationBar.barTintColor = myBlueColor
-//        navigationController?.navigationBar.backgroundColor = myBlueColor
-//        navigationController?.navigationBar.isTranslucent = true
-//        navigationController?.navigationBar.barTintColor = myBlueColor.withAlphaComponent(0.5)
-        
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .search, target: self, action: #selector(openSearchVC))
+        
+        let redNoticeView = UIImageView(image: UIImage(named: "redNotice"))
+        redNoticeView.contentMode = .scaleAspectFit
+        redNoticeView.translatesAutoresizingMaskIntoConstraints = false
+        navigationItem.leftBarButtonItem = UIBarButtonItem(customView: redNoticeView)
+        NSLayoutConstraint.activate([
+            redNoticeView.widthAnchor.constraint(equalToConstant: 40)
+        ])
+        
+        let backgroundImage = UIImageView(frame: self.tableView.bounds)
+        backgroundImage.image = UIImage(named: "fon2")
+        backgroundImage.contentMode = .scaleAspectFill
+        self.tableView.backgroundView = backgroundImage
         tableView.rowHeight = 160
     }
     
@@ -39,86 +54,83 @@ class MainTableViewController: UITableViewController {
         showNotices()
     }
     
-    
     func showNotices() {
         guard !isLoading else { return }
         isLoading = true
         Task {
             do {
-                print("start load")
-                if nextURLString != nil {
-                    if let url = URL(string: nextURLString!) {
-                        let result = try await Networker.shared.fetchNoticesData(by: url)
-                        let newNotes = result.embedded.notices
-                        notes.append(contentsOf: newNotes)
-//                        print("+++ \(notes.count)")
-                        if let newNextURLString = result.links.next?.href {
-                            if newNextURLString != nextURLString {
-                                nextURLString = newNextURLString
-                            } else {
-                                nextURLString = nil
-                            }
-                        } else {
-                            nextURLString = nil
-                        }
-                        for note in newNotes {
-                            if let imageLink = note.links.thumbnail?.href {
-                                if let imageData = try await Networker.shared.fetchImageData(from: imageLink) {
-                                    if let image = UIImage(data: imageData) {
-                                        images.append(image)
-                                    }
-                                }
-                            } else {
-                                images.append(UIImage(named: "person")!)
-                            }
-                        }
-                    }
+                if isDataLoaded {
+                    await loadAdditionalNotices()
+                } else {
+                    await loadInitialNotices()
                 }
-                if !isDataLoaded {
-                    let result = try await Networker.shared.fetchNoticesData(by: Networker.shared.createURL(by: Networker.shared.searchQuery))
-                    notes = result.embedded.notices
-                    numberOfNotices = result.total
-                    isDataLoaded = true
-                    if let nextLink = result.links.next?.href {
-                        nextURLString = nextLink
-                    }
-                    for note in notes {
-                        if let imageLink = note.links.thumbnail?.href {
-                            if let imageData = try await Networker.shared.fetchImageData(from: imageLink) {
-                                if let image = UIImage(data: imageData) {
-                                    images.append(image)
-                                }
-                            }
-                        } else {
-                            images.append(UIImage(named: "person")!)
-                        }
-                    }
-                }
-                
-            } catch NetworkerError.invalidUrl {
-                print("??? invalid URL ???")
-            } catch NetworkerError.invalidData {
-                print("??? invalid Data ???")
-            } catch NetworkerError.invalidImageData {
-                print("??? invalid image Data ???")
-            } catch NetworkerError.invalidResponse {
-                print("??? invalid response ???")
-            } catch NetworkerError.invalidImageUrl {
-                print("??? invalid image URL ???")
+            } catch {
+                print("error while loading notices: \(error)")
             }
-            createHeader()
             tableView.reloadData()
             isLoading = false
-//            print(notes.count)
         }
-
     }
     
-    func createHeader() {
+    private func loadInitialNotices() async {
+        do {
+            let result = try await loadNoticesData(url: Network.shared.createURL(by: Network.shared.searchQuery))
+            notes = result.notices
+            isDataLoaded = true
+            nextURLString = result.nextURL
+            
+            await loadImages(for: result.notices)
+        } catch {
+            print("error loading initial data: \(error)")
+        }
+    }
+    
+    private func loadAdditionalNotices() async {
+        do {
+            if let nextURLString = nextURLString, let url = URL(string: nextURLString) {
+                let result = try await loadNoticesData(url: url)
+                notes.append(contentsOf: result.notices)
+                self.nextURLString = result.nextURL
+                await loadImages(for: result.notices)
+            }
+        } catch {
+            print("error loading additional data: \(error)")
+        }
+    }
+    
+    private func loadNoticesData(url: URL) async throws -> (notices: [Notice], nextURL: String?) {
+        let result = try await Network.shared.fetchNoticesData(by: url)
+        numberOfNotices = result.total
+        return (result.embedded.notices, result.links.next?.href)
+    }
+    
+    private func loadImages(for notices: [Notice]) async {
+        for note in notices {
+            let image = await loadImage(for: note)
+            images.append(image)
+        }
+    }
+    
+    private func loadImage(for note: Notice) async -> UIImage? {
+            guard let imageLink = note.links.thumbnail?.href else { return UIImage(named: "person")! }
+            do {
+                guard let imageData = try await Network.shared.fetchImageData(from: imageLink) else { return UIImage(named: "person") }
+                return UIImage(data: imageData)
+            } catch {
+                print("Image loading error: \(error)")
+                return UIImage(named: "person")
+            }
+        }
+    
+    private func createHeader() {
         let headerLabel = UILabel()
         headerLabel.frame = CGRect(x: 0, y: 0, width: tableView.frame.width, height: 30)
         headerLabel.backgroundColor = .clear
-        headerLabel.text = "\(numberOfNotices ?? 0) persons found"
+        headerLabel.text = if numberOfNotices != nil {
+            "\(numberOfNotices ?? 0) persons found"
+        } else {
+            "searching..."
+        }
         headerLabel.textAlignment = .center
         tableView.tableHeaderView = headerLabel
     }
@@ -130,21 +142,25 @@ class MainTableViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "mainCell", for: indexPath)
         
-        let backgroundImage = UIImageView(frame: cell.bounds)
-        backgroundImage.image = UIImage(named: "fon2")
-        backgroundImage.contentMode = .scaleAspectFill
-        tableView.backgroundView = backgroundImage
+        configureCell(cell, for: indexPath)
         
-        cell.backgroundColor = .clear
-        
-        cell.textLabel?.textColor = myBlueColor
-        cell.detailTextLabel?.textColor = .black
+        return cell
+    }
+     
+    private func configureCell(_ cell: UITableViewCell, for indexPath: IndexPath) {
+        cell.textLabel?.text = "\(notes[indexPath.row].name)\n\(notes[indexPath.row].forename)"
+        cell.detailTextLabel!.text = "\(calculateAge(from: notes[indexPath.row].dateOfBirth))\n\(countries.getCountryName(by: notes[indexPath.row].nationalities?.first ?? ""))"
         
         cell.imageView?.image = images[indexPath.row]
         cell.imageView?.layer.cornerRadius = 10
         cell.imageView?.layer.borderColor = myBlueColor.cgColor
         cell.imageView?.layer.borderWidth = 1
         cell.imageView?.contentMode = .scaleAspectFill
+        
+        cell.backgroundColor = .clear
+        cell.textLabel?.textColor = myBlueColor
+        cell.detailTextLabel?.textColor = .black
+        
         cell.imageView?.translatesAutoresizingMaskIntoConstraints = false
         cell.textLabel?.translatesAutoresizingMaskIntoConstraints = false
         cell.detailTextLabel?.translatesAutoresizingMaskIntoConstraints = false
@@ -161,10 +177,6 @@ class MainTableViewController: UITableViewController {
             cell.detailTextLabel!.topAnchor.constraint(lessThanOrEqualTo: cell.textLabel!.bottomAnchor, constant: 20),
             cell.detailTextLabel!.bottomAnchor.constraint(greaterThanOrEqualTo: cell.bottomAnchor, constant: -30)
         ])
-        cell.textLabel?.text = "\(notes[indexPath.row].name)\n\(notes[indexPath.row].forename)"
-        cell.detailTextLabel!.text = calculateAge(from: notes[indexPath.row].dateOfBirth)
-
-        return cell
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {

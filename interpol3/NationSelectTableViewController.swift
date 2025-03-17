@@ -30,7 +30,8 @@ class NationSelectTableViewController: UITableViewController {
         searchController.searchBar.placeholder = "Search Country"
         searchController.automaticallyShowsCancelButton = true
         
-        navigationItem.searchController = searchController
+  //      navigationItem.searchController = searchController
+        tableView.tableHeaderView = searchController.searchBar
         definesPresentationContext = true
         
         filteredCounries = countryList

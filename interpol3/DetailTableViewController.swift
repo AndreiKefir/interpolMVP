@@ -11,7 +11,7 @@ class DetailTableViewController: UITableViewController {
     let myBlueColor = #colorLiteral(red: 0, green: 0.1617512107, blue: 0.4071177244, alpha: 1)
     var countries = Countries()
     var imagesString = [String]()
-    var imagesData = [UIImage]()
+    var images = [UIImage]()
     var person: PersonNotice?
     var personID: String = ""
     var showData = [[(String?, String?)](),[(String?, String?)](),[(String?, String?)]()]
@@ -21,29 +21,22 @@ class DetailTableViewController: UITableViewController {
         
         createHeaderView()
         getPersonInfo()
-        
-        tableView.delegate = self
-        tableView.dataSource = self
-        tableView.estimatedRowHeight = 20
-        tableView.rowHeight = UITableView.automaticDimension
     
     }
-    
     
     func getPersonInfo() {
         Task {
             do {
-                let result = try await Networker.shared.getPerson(by: personID)
-                person = result
-//                print("!!! \(personID)")
+                let personData = try await Network.shared.fetchPersonData(from: personID)
+                person = personData
                 guard let imagesLink = person?.links.images?.href else { return }
-                    let resultImages = try await Networker.shared.getPersonImages(by: imagesLink)
+                    let resultImages = try await Network.shared.fetchPersonImages(from: imagesLink)
                 for image in resultImages.embedded.images {
                     imagesString.append(image.links.linksSelf.href)
                 }
                 for imageString in imagesString {
-                    if let imageData = try await Networker.shared.fetchImageData(from: imageString) {
-                        imagesData.append(UIImage(data: imageData)!)
+                    if let imageData = try await Network.shared.fetchImageData(from: imageString) {
+                        images.append(UIImage(data: imageData)!)
                     }
                 }
                 
@@ -55,19 +48,8 @@ class DetailTableViewController: UITableViewController {
                     showData[0].append(("Place of birth", person?.placeOfBirth))
                 }
                 if let haveNations = person?.nationalities {
-                    var resultString = ""
-                    var nationsArray = []
-                    for nation in haveNations {
-                        nationsArray.append(Locale.current.localizedString(forRegionCode: nation)!)
-                    }
-                    let separator = ", "
-                    for (index, element) in nationsArray.enumerated() {
-                        if index > 0 {
-                            resultString += separator
-                        }
-                        resultString += element as! String
-                    }
-                    showData[0].append(("Nationality", resultString))
+                    let nationsArray = haveNations.map { countries.getCountryName(by: $0) }
+                    showData[0].append(("Nationality", nationsArray.joined(separator: ", ")))
                 }
                 if person?.languagesSpokenIDS != nil {
                     let languagesString = person?.languagesSpokenIDS?.joined(separator: ", ")
@@ -80,11 +62,11 @@ class DetailTableViewController: UITableViewController {
                     showData[1].append(("Weight", "\(String((person?.weight)!)) kilograms"))
                 }
                 if person?.hairsID != nil {
-                    let hairsString = person?.hairsID?.joined(separator: ",")
+                    let hairsString = person?.hairsID?.joined(separator: ", ")
                     showData[1].append(("Color of hair", hairsString))
                 }
                 if let eyesColors = person?.eyesColorsID {
-                    let eyesString = eyesColors.joined(separator: ",")
+                    let eyesString = eyesColors.joined(separator: ", ")
                     showData[1].append(("Color of eyes", eyesString))
                 }
                 if let warrants = person?.arrestWarrants.first {
@@ -92,11 +74,11 @@ class DetailTableViewController: UITableViewController {
                     showData[2].append(("Charge", warrants.charge))
                 }
                 
-            } catch NetworkerError.invalidUrl {
+            } catch NetworkError.invalidUrl {
                 print("invalid URL")
-            } catch NetworkerError.invalidData {
+            } catch NetworkError.invalidData {
                 print("invalid Data")
-            } catch NetworkerError.invalidResponse {
+            } catch NetworkError.invalidResponse {
                 print("invalid response")
             }
             tableView.reloadData()
@@ -104,6 +86,17 @@ class DetailTableViewController: UITableViewController {
         }
     }
     
+    @objc func imageTapped(_ sender: UITapGestureRecognizer) {
+        guard let tappedImageView = sender.view as? UIImageView else { return }
+        let imageVC = ImageViewController()
+        imageVC.image = tappedImageView.image
+        
+        if let popoverController = imageVC.popoverPresentationController {
+            popoverController.sourceView = self.tableView.tableHeaderView
+        }
+        
+        self.present(imageVC, animated: true)
+    }
     
     func createHeaderView() {
         tableView.tableHeaderView = UIView(frame: CGRect(x: 0, y: 0, width: view.frame.size.width, height: 160))
@@ -118,10 +111,14 @@ class DetailTableViewController: UITableViewController {
         stackView.translatesAutoresizingMaskIntoConstraints = false
         
         //add images to stackView
-        for image in imagesData {
+        for image in images {
             let imageView = UIImageView(image: image)
             imageView.contentMode = .scaleAspectFit
+            imageView.isUserInteractionEnabled = true
             stackView.addArrangedSubview(imageView)
+            
+            let tapGesture = UITapGestureRecognizer(target: self, action: #selector(imageTapped))
+            imageView.addGestureRecognizer(tapGesture)
         }
         
         tableView.tableHeaderView?.addSubview(stackView)
@@ -133,9 +130,6 @@ class DetailTableViewController: UITableViewController {
             stackView.topAnchor.constraint(equalTo: tableView.tableHeaderView!.topAnchor, constant: 10),
             stackView.bottomAnchor.constraint(equalTo: tableView.tableHeaderView!.bottomAnchor, constant: -10)
         ])
-        
-//        tableView.reloadData()
-        
     }
     
     
@@ -148,7 +142,7 @@ class DetailTableViewController: UITableViewController {
     
         switch section {
         case 0: titleOfSection = "Identity particulars"
-        case 1: titleOfSection = "Physical description"
+        case 1: if !showData[1].isEmpty { titleOfSection = "Physical description" }
         case 2: titleOfSection = "Charges"
         default: break
         }
@@ -184,12 +178,3 @@ class DetailTableViewController: UITableViewController {
     }
     
 }
-
-    
-    
-//  search button
-//    search() {
-          //hide seearch controller
-//        dismiss(animated: true, completion: nil)
-//          udate viewController
-//    }
