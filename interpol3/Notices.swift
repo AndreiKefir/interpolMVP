@@ -28,8 +28,8 @@ struct Notice: Codable {
     let dateOfBirth: String
     let nationalities: [String]?
     let entityID: String
-    let forename: String
-    let name: String
+    let forename: String?
+    let name: String?
     let links: NoticeLinks
 
     enum CodingKeys: String, CodingKey {

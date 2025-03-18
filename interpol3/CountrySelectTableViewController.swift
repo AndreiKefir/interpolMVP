@@ -50,13 +50,6 @@ class CountrySelectTableViewController: UITableViewController {
     
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-//        let selectedCell = tableView.cellForRow(at: indexPath)
-//        if selectedCountry == countryList[indexPath.row] {
-//            selectedCell?.accessoryType = .none
-//        } else {
-//            selectedCountry = countryList[indexPath.row]
-//            selectedCell?.accessoryType = .checkmark
-//        }
         
         delegate?.didSelectCountry(country: filteredCounries[indexPath.row])
         navigationController?.popViewController(animated: true)
