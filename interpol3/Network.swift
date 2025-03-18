@@ -17,28 +17,24 @@ class Network {
         session = URLSession(configuration: config)
     }
     
-    func createURL(by queries: [URLQueryItem]) -> URL {
+    func createURL(by queries: [URLQueryItem]) -> URL? {
         var components = URLComponents()
         components.scheme = "https"
         components.host = "ws-public.interpol.int"
         components.path = "/notices/v1/red"
         components.queryItems = queries
-   
-        let url = components.url
-        print("---!!!\(url!)")
-        return url ?? URL(string: "https://ws-public.interpol.int/notices/v1/red?")!
+        
+        return components.url
     }
     
     func fetchImageData(from urlString: String) async throws -> Data? {
         guard let url = URL(string: urlString) else {
             throw NetworkError.invalidImageUrl
         }
-        do {
-            let (data, _) = try await session.data(from: url)
-            return data
-        } catch {
+        guard let (data, _) = try? await session.data(from: url) else {
             throw NetworkError.invalidImageData
         }
+        return data
     }
 
     func fetchPersonImages(from imagesLink: String) async throws -> PersonImages {
@@ -73,15 +69,6 @@ class Network {
         }
         return noticesInfo
     }
-    
-//    func fetchNoticesData(by url: URL) async throws -> Notices {
-//        do {
-//            let (data, response) = try await session.data(from: url)
-//            return try JSONDecoder().decode(Notices.self, from: data)
-//        } catch {
-//            throw NetworkError.invalidData
-//        }
-//    }
 
 }
 

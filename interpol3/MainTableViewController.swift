@@ -26,7 +26,6 @@ class MainTableViewController: UITableViewController {
         
         configureView()
         createHeader()
-        
     }
     
     func configureView() {
@@ -74,7 +73,10 @@ class MainTableViewController: UITableViewController {
     
     private func loadInitialNotices() async {
         do {
-            let result = try await loadNoticesData(url: Network.shared.createURL(by: Network.shared.searchQuery))
+            guard let url = Network.shared.createURL(by: Network.shared.searchQuery) else {
+                throw NetworkError.invalidUrl
+            }
+            let result = try await loadNoticesData(url: url)
             notes = result.notices
             isDataLoaded = true
             nextURLString = result.nextURL
@@ -142,13 +144,7 @@ class MainTableViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "mainCell", for: indexPath)
         
-        configureCell(cell, for: indexPath)
-        
-        return cell
-    }
-     
-    private func configureCell(_ cell: UITableViewCell, for indexPath: IndexPath) {
-        cell.textLabel?.text = "\(notes[indexPath.row].name)\n\(notes[indexPath.row].forename)"
+        cell.textLabel?.text = "\(notes[indexPath.row].name ?? "")\n\(notes[indexPath.row].forename ?? "")"
         cell.detailTextLabel!.text = "\(calculateAge(from: notes[indexPath.row].dateOfBirth))\n\(countries.getCountryName(by: notes[indexPath.row].nationalities?.first ?? ""))"
         
         cell.imageView?.image = images[indexPath.row]
@@ -177,6 +173,7 @@ class MainTableViewController: UITableViewController {
             cell.detailTextLabel!.topAnchor.constraint(lessThanOrEqualTo: cell.textLabel!.bottomAnchor, constant: 20),
             cell.detailTextLabel!.bottomAnchor.constraint(greaterThanOrEqualTo: cell.bottomAnchor, constant: -30)
         ])
+        return cell
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {

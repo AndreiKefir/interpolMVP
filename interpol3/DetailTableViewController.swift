@@ -42,7 +42,13 @@ class DetailTableViewController: UITableViewController {
                 
                 showData[0].append(("Family name", person?.name ?? "No name"))
                 showData[0].append(("Forename", person?.forename ?? "No forename"))
-                showData[0].append(("Gender", person?.sexID ?? "No gender"))
+                if let gender = person?.sexID {
+                    if gender == "M" {
+                        showData[0].append(("Gender", "Male"))
+                    } else {
+                        showData[0].append(("Gender", "Female"))
+                    }
+                }
                 showData[0].append(("Date of birth", person?.dateOfBirth ?? "No date"))
                 if person?.placeOfBirth != nil {
                     showData[0].append(("Place of birth", person?.placeOfBirth))

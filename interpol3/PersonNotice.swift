@@ -10,10 +10,12 @@ import Foundation
 struct PersonNotice: Codable {
     let arrestWarrants: [ArrestWarrant]
     let weight: Double?
-    let forename, dateOfBirth, entityID: String
+    let forename: String?
+    let dateOfBirth, entityID: String
     let languagesSpokenIDS, nationalities: [String]?
     let height: Double?
-    let sexID, name: String
+    let sexID: String?
+    let name: String?
     let countryOfBirthID: String?
     let distinguishingMarks: String?
     let eyesColorsID, hairsID: [String]?

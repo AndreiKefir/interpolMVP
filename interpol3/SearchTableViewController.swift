@@ -30,12 +30,9 @@ class SearchTableViewController: UITableViewController, UITextFieldDelegate {
         tapGesture.cancelsTouchesInView = false
         view.addGestureRecognizer(tapGesture)
         
-    }
-        
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
         detailNationalityLabel.text = selectedNationality
         detailCountryLabel.text = selectedCountry
+        
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -73,12 +70,12 @@ class SearchTableViewController: UITableViewController, UITextFieldDelegate {
     func createQuery() -> [URLQueryItem] {
         var queryItems = [URLQueryItem]()
         
-        if !forenameTextField.text!.isEmpty {
-            let forenameQuery = URLQueryItem(name: "forename", value: forenameTextField.text)
+        if let forename = forenameTextField.text, !forename.isEmpty {
+            let forenameQuery = URLQueryItem(name: "forename", value: forename)
             queryItems.append(forenameQuery)
         }
-        if !familyNameTextField.text!.isEmpty {
-            let familyNameQuery = URLQueryItem(name: "name", value: familyNameTextField.text)
+        if let familyName = familyNameTextField.text, !familyName.isEmpty {
+            let familyNameQuery = URLQueryItem(name: "name", value: familyName)
             queryItems.append(familyNameQuery)
         }
         if genderSegment.selectedSegmentIndex == 1 {
@@ -108,9 +105,11 @@ class SearchTableViewController: UITableViewController, UITextFieldDelegate {
 extension SearchTableViewController: CountrySelectDelegate, NationSelectDelegate {
     func didSelectNation(country: String) {
         selectedNationality = country
+        detailNationalityLabel.text = country
     }
     
     func didSelectCountry(country: String) {
         selectedCountry = country
+        detailCountryLabel.text = country
     }
 }
