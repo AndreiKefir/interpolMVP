@@ -53,6 +53,9 @@ class Network {
         }
         let (data, response) = try await session.data(from: url)
         guard let personInfo =  try? JSONDecoder().decode(PersonNotice.self, from: data) else {
+            print("no data here!")
+            print(personIDString)
+            print(idString)
             throw NetworkError.invalidData
         }
         return personInfo
