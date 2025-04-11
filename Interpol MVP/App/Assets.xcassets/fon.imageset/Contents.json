@@ -1,0 +1,21 @@
+{
+  "images" : [
+    {
+      "filename" : "66dfebdb59fb6289f6e3fd4c_5d678af7e48df3f290e2911a_interpol.jpeg",
+      "idiom" : "universal",
+      "scale" : "1x"
+    },
+    {
+      "idiom" : "universal",
+      "scale" : "2x"
+    },
+    {
+      "idiom" : "universal",
+      "scale" : "3x"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}
